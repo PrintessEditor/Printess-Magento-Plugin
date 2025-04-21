@@ -30,5 +30,4 @@
     <type name="Magento\Sales\Model\Reorder\Reorder">
         <plugin name="Printess_PrintessDesigner" type="Printess\PrintessDesigner\Plugin\Reorder" sortOrder="1"/>
     </type>
-    <preference for="Printess\PrintessDesigner\Api\PrintessApiInterface" type="Printess\PrintessDesigner\Api\PrintessApi"/>
 </config>
