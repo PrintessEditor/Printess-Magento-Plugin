@@ -3,7 +3,7 @@
      <referenceBlock name="sales.email.order.renderers">
         <!-- <block class="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder" template="Printess_PrintessDesigner::email/items/order/default.phtml"/> -->
         <block class="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder" as="simple" template="Printess_PrintessDesigner::email/items/order/default.phtml" />
-        <block class="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder" as="downloadable" template="Printess_PrintessDesigner::email/items/order/default.phtml" />
+        <!-- <block class="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder" as="downloadable" template="Printess_PrintessDesigner::email/items/order/default.phtml" /> -->
         <block class="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder" as="virtual" template="Printess_PrintessDesigner::email/items/order/default.phtml" />
         <block class="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder" as="configurable" template="Printess_PrintessDesigner::email/items/order/default.phtml" />
     </referenceBlock>
