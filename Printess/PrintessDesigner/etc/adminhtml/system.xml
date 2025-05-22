@@ -61,6 +61,11 @@
                     <label>Legal price notice</label>
                     <comment><![CDATA[Global fallback. Each product can have individual notices. Markdonw allowed.]]></comment>
                 </field>
+                <field id="ui_version" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>UI Version</label>
+                    <source_model>Printess\PrintessDesigner\Model\Config\Source\UiVersion</source_model>
+                    <comment><![CDATA[Global fallback. Each product can use individual ui versions.]]></comment>
+                </field>
             </group>
         </section>
     </system>

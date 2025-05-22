@@ -1,19 +1,19 @@
 html {
     height: -webkit-fill-available;
-}
-
-body.hideAll>*:not(#printess-container) {
+  }
+  
+  body.hideAll>*:not(#printess-container, .printess-owned) {
     display: none !important;
-}
-
-body.hideAll {
+  }
+  
+  body.hideAll {
     margin: 0;
     padding: 0;
     height: 100vh;
     height: -webkit-fill-available;
-}
-
-#printess-container>#printess {
+  }
+  
+  #printess-container>#printess {
     width: 100vw;
     height: 100%;
     border: none;
@@ -21,4 +21,4 @@ body.hideAll {
     position: fixed;
     top: 0;
     left: 0;
-}
+  }

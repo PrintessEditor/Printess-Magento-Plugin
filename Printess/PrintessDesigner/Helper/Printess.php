@@ -25,6 +25,7 @@ class Printess extends AbstractHelper
     public const XML_PATH_DESIGNER_EDITOR_URL = "designer/urls/editor_url";
     public const XML_PATH_DESIGNER_EDITOR_VERSION = "designer/urls/editor_version";
     public const XML_PATH_DESIGNER_LEGAL_TEXT = "designer/frontend_settings/legal_price_notice";
+    public const XML_PATH_DESIGNER_UI_VERSION = "designer/frontend_settings/ui_version";
 
     /**
      * @var ProductRepositoryInterface
@@ -281,6 +282,7 @@ class Printess extends AbstractHelper
         $settings["editorUrl"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_EDITOR_URL, $storeScope), "https://editor.printess.com");
         $settings["apiUrl"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_API_URL, $storeScope), "https://api.printess.com");
         $settings["legalText"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_LEGAL_TEXT, $storeScope), "");
+        $settings["uiVersion"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_UI_VERSION, $storeScope), "");
 
         return $settings;
     }

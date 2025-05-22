@@ -68,6 +68,7 @@
         const template = <?= $_printess->hasTemplate($_sku) ? json_encode($_product->getData('printess_template')) :  json_encode("") ?>;
         const hidePriceInEditor = <?= $_printess->hasTemplate($_sku) ? json_encode($_product->getData('printess_hide_prices_in_editor') == 1) :  json_encode("false") ?>;
         const legalText = <?= json_encode($_product->getData('printess_legal_text')) ?> || <?= json_encode($editorSettings["legalText"]) ?> || "";
+        const uiVersion = <?= json_encode($_product->getData('printess_ui_version')) ?> || <?= json_encode($editorSettings["uiVersion"]) ?> || "";
         const product = {
             "name": <?= json_encode($_product->getName()); ?>,
             "price": <?= json_encode($_product->getPrice()); ?>,
@@ -81,6 +82,7 @@
                 shopToken: shopSettings.shopToken,
                 editorUrl: shopSettings.editorUrl,
                 editorVersion: shopSettings.editorVersion,
+                uiVersion: uiVersion,
                 startupLogoUrl: shopSettings.customLogoUrl,
                 showStartupAnimation: shopSettings.showStartupAnimation,
                 hidePricesInEditor: hidePriceInEditor === true,

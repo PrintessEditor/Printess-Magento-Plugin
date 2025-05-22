@@ -106,6 +106,10 @@ class PrintessApi implements PrintessApiInterface
 
             if(isset($product))
             {
+                if(!array_key_exists("uiVersion", $editorSettings) || null === $editorSettings["uiVersion"] ||  empty($editorSettings["uiVersion"] )){
+                    $editorSettings["uiVersion"] = $product->getData('printess_ui_version');
+                } 
+
                 $info = array(
                     "id" => $product->getId(),
                     "sku" => $product->getSku(),

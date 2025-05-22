@@ -124,6 +124,33 @@ class UpgradeData implements UpgradeDataInterface
                     'apply_to' => ''
                 ]
             );
+
+            $eavSetup->addAttribute(
+                Product::ENTITY,
+                'printess_ui_version',
+                [
+                    'group' => 'Printess',
+                    'type' => 'varchar',
+                    'backend' => '',
+                    'frontend' => '',
+                    'label' => 'Ui Version',
+                    'input' => 'select',
+                    'class' => '',
+                    'source' => 'Printess\PrintessDesigner\Model\Config\Source\UiVersion',
+                    'global' => ScopedAttributeInterface::SCOPE_STORE,
+                    'visible' => true,
+                    'required' => false,
+                    'user_defined' => false,
+                    'default' => '',
+                    'searchable' => false,
+                    'filterable' => false,
+                    'comparable' => false,
+                    'visible_on_front' => false,
+                    'used_in_product_listing' => false,
+                    'unique' => false,
+                    'apply_to' => ''
+                ]
+            );
         //}
     }
 }
