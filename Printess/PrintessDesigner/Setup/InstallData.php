@@ -240,7 +240,7 @@ class InstallData implements InstallDataInterface
                 'label' => 'Ui Version',
                 'input' => 'select',
                 'class' => '',
-                'source' => 'Printess\PrintessDesigner\Model\Config\Source\UiVersion',
+                'source' => 'Printess\PrintessDesigner\Model\Config\Source\ProductUiVersion',
                 'global' => ScopedAttributeInterface::SCOPE_STORE,
                 'visible' => true,
                 'required' => false,
@@ -267,6 +267,6 @@ class InstallData implements InstallDataInterface
     {
         $this->addAdminInterfaceProperties();
 
-        
+
     }
 }

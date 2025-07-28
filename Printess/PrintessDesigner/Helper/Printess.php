@@ -136,11 +136,11 @@ class Printess extends AbstractHelper
         if (!is_null($sku))
         {
             $parentProduct = $product->getParent($product);
-            
+
             if(!isset($parentProduct)) {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $parentIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
-                
+
                 if(count($parentIds) > 0) {
                     $parentProduct = $this->productRepository->getById($parentIds[0]);
                 }
@@ -155,7 +155,7 @@ class Printess extends AbstractHelper
                 $variants = array();
                 $options = $this->getOptions($product);
                 $children = $this->productCollectionFactory->create()->setFlag('product_children', true)->setProductFilter($product);
-    
+
                 foreach ($children as $child) {
                     $childProduct = $this->productRepository->getById($child->getId());
 
@@ -168,10 +168,10 @@ class Printess extends AbstractHelper
                     if(array_key_exists($child->getSku(), $options)) {
                         $newVariant["options"] = $options[$child->getSku()];
                     }
-    
+
                     $variants[] = $newVariant;
                 }
-                
+
                 if(count($variants) == 0) {
                     $dummy = $product->getTypeId();
                     $variants[] = [
@@ -209,11 +209,11 @@ class Printess extends AbstractHelper
         if (!is_null($sku)) {
             $product = $this->productRepository->get($sku);
             $parentProduct = $product->getParent($product);
-            
+
             if(!isset($parentProduct)) {
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $parentIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
-                
+
                 if(count($parentIds) > 0) {
                     $parentProduct = $this->productRepository->getById($parentIds[0]);
                 }
@@ -282,7 +282,7 @@ class Printess extends AbstractHelper
         $settings["editorUrl"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_EDITOR_URL, $storeScope), "https://editor.printess.com");
         $settings["apiUrl"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_API_URL, $storeScope), "https://api.printess.com");
         $settings["legalText"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_LEGAL_TEXT, $storeScope), "");
-        $settings["uiVersion"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_UI_VERSION, $storeScope), "");
+        $settings["uiVersion"] = $this->denullify($this->scopeConfig->getValue(self::XML_PATH_DESIGNER_UI_VERSION, $storeScope), "PanelUi");
 
         return $settings;
     }
