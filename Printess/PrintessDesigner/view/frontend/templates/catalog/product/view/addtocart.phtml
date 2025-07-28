@@ -33,7 +33,7 @@
         </div>
         <?php endif; ?>
         <div class="actions">
-            <button type='submit' 
+            <button type='submit'
                     title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
                     class="action primary tocart productpage"
                     <?php if($_printess->hasTemplate($_sku)  && ($editorSettings["embedEditor"] === "true" ||  $editorSettings["embedEditor"] === true))  :?> style="display:none" <?php endif; ?>
@@ -68,7 +68,7 @@
         const template = <?= $_printess->hasTemplate($_sku) ? json_encode($_product->getData('printess_template')) :  json_encode("") ?>;
         const hidePriceInEditor = <?= $_printess->hasTemplate($_sku) ? json_encode($_product->getData('printess_hide_prices_in_editor') == 1) :  json_encode("false") ?>;
         const legalText = <?= json_encode($_product->getData('printess_legal_text')) ?> || <?= json_encode($editorSettings["legalText"]) ?> || "";
-        const uiVersion = <?= json_encode($_product->getData('printess_ui_version')) ?> || <?= json_encode($editorSettings["uiVersion"]) ?> || "";
+        const uiVersion = <?= json_encode($_product->getData('printess_ui_version')) ?> || <?= json_encode($editorSettings["uiVersion"]) ?> || "PanelUi";
         const product = {
             "name": <?= json_encode($_product->getName()); ?>,
             "price": <?= json_encode($_product->getPrice()); ?>,

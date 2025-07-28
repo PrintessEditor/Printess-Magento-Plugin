@@ -30,7 +30,7 @@ class PrintessApi implements PrintessApiInterface
     protected Cart $cart;
 
     protected $logger;
- 
+
     public function __construct(
         LoggerInterface $logger,
         ProductRepositoryInterface $productRepositoryInterface,
@@ -47,11 +47,11 @@ class PrintessApi implements PrintessApiInterface
         $this->request = $request;
         $this->cart = $cart;
     }
- 
+
     /**
      * @inheritdoc
      */
- 
+
     public function getProductInfo()
     {
         $response = ['success' => false];
@@ -62,7 +62,7 @@ class PrintessApi implements PrintessApiInterface
         $printessHelper = $objectManager->get('Printess\PrintessDesigner\Helper\Printess');
 
         $editorSettings = $printessHelper->getEditorSettings();
- 
+
         try {
             if(isset($body))
             {
@@ -89,16 +89,16 @@ class PrintessApi implements PrintessApiInterface
             if(isset($product))
             {
                 $parentProduct = $product->getParent($product);
-                
+
                 if(!isset($parentProduct)) {
                     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                     $parentIds = $objectManager->create('Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable')->getParentIdsByChild($product->getId());
-                    
+
                     if(count($parentIds) > 0) {
                         $parentProduct = $this->productRepository->getById($parentIds[0]);
                     }
                 }
-    
+
                 if(isset($parentProduct)) {
                     $product = $parentProduct;
                 }
@@ -106,9 +106,11 @@ class PrintessApi implements PrintessApiInterface
 
             if(isset($product))
             {
-                if(!array_key_exists("uiVersion", $editorSettings) || null === $editorSettings["uiVersion"] ||  empty($editorSettings["uiVersion"] )){
-                    $editorSettings["uiVersion"] = $product->getData('printess_ui_version');
-                } 
+                $uiVersion = $product->getData('printess_ui_version');
+
+                if($uiVersion !== null && !empty($uiVersion)) {
+                    $editorSettings["uiVersion"] = $uiVersion;
+                }
 
                 $info = array(
                     "id" => $product->getId(),
@@ -143,7 +145,7 @@ class PrintessApi implements PrintessApiInterface
                     }
                 }
             }
-    
+
             $info["variants"] = $printessHelper->getVariations($product->getId(), $product->getSku(), true);
             $info["editorSettings"] = $editorSettings;
             $info["priceFormat"] = $printessHelper->getPriceFormat();
@@ -154,7 +156,7 @@ class PrintessApi implements PrintessApiInterface
             $this->logger->info($e->getMessage());
         }
         $returnArray = json_encode($response);
-        return $returnArray; 
+        return $returnArray;
     }
 }
 

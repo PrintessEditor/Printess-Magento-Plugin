@@ -4,7 +4,7 @@ namespace Printess\PrintessDesigner\Model\Config;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
-class UiVersion implements OptionSourceInterface
+class ProductUiVersion implements OptionSourceInterface
 {
 
     /**
@@ -29,6 +29,7 @@ class UiVersion implements OptionSourceInterface
     public function toArray(): array
     {
         return [
+            "" => 'Use global settings',
             "panelUi" => 'Panel Ui',
             "classic" => 'Deprecated [The "old" deprecated buyer side ui]',
         ];

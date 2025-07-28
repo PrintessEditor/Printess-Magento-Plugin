@@ -52,9 +52,9 @@ class ApiException extends Exception
         $message = "",
         $code = 0,
         $field = null,
-        RequestInterface $request = null,
-        ResponseInterface $response = null,
-        Throwable $previous = null
+        ?RequestInterface $request = null,
+        ?ResponseInterface $response = null,
+        ?Throwable $previous = null
     ) {
         $this->raisedAt = new DateTimeImmutable();
 
@@ -101,7 +101,7 @@ class ApiException extends Exception
      * @return ApiException
      * @throws ApiException
      */
-    public static function createFromResponse(ResponseInterface $response, RequestInterface $request = null, Throwable $previous = null): ApiException
+    public static function createFromResponse(ResponseInterface $response, ?RequestInterface $request = null, ?Throwable $previous = null): ApiException
     {
         $object = static::parseResponseBody($response);
 

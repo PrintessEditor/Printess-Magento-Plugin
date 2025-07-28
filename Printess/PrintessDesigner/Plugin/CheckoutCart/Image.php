@@ -25,7 +25,7 @@ class Image
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        Json $serializer = null
+        ?Json $serializer = null
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
