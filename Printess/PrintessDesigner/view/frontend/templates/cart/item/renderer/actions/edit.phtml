@@ -10,6 +10,14 @@ $uid = str_replace('-', '', $block->CreateGuidV4());
             const quantityInput = document.querySelector("input[name='cart\\[" + item.id + "\\]\\[qty\\]']");
             const quantity = quantityInput ? parseInt(quantityInput.value) : 1;//<?php echo json_encode($block->getQty()) ?>
 
+            try {
+              if(item.itemOptions && typeof item.itemOptions === "string") {
+                item.itemOptions = JSON.parse(item.itemOptions);
+              }
+            } catch(e) {
+
+            }
+
             const basketItem = {
                 "product_sku": item.sku,
                 "product_id": item.variants && item.variants.length > 0 ? item.variants[0].product_id : item.id,
