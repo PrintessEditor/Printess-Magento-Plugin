@@ -1,1 +1,698 @@
-﻿class PrintessMagentoIntegration{constructor(t,e,o){this.PRODUCT_FORM_SELECTOR="#product_addtocart_form",this.formatPriceCallback=null,this.shopSettings=t,this.product=e,this.cartItem=o,this.product&&this.product.variants&&this.product.variants.forEach(t=>{t.formFields&&"string"==typeof t.formFields&&(t.formFields=JSON.parse(t.formFields))})}getGlobalConfig(){return window&&window.printessGlobalConfig?window.printessGlobalConfig:{}}recordForEach(t,e){if(t&&"function"==typeof e)for(const o in t)if(t.hasOwnProperty(o)&&!1===e(o,t[o]))return!1;return!0}filterRecord(t,e){const o={};if(t&&"function"==typeof e)for(const n in t)t.hasOwnProperty(n)&&!0===e(n,t[n])&&(o[n]=t[n]);return o}mapRecord(t,e){const o=[];return t&&"function"==typeof e&&this.recordForEach(t,(t,n)=>{o.push(e(t,n))}),o}parseAttributeId(t){let e=-1;return 0===t.indexOf("super_attribute[")&&"]"===t[t.length-1]&&(e=parseInt(t.substring(16,t.length-1))),e}getVariantOptions(){const t={};return this.product&&this.product.variants&&this.product.variants.forEach(e=>{e.options&&e.options.forEach(e=>{void 0===t[e.optionId]&&(t[e.optionId]={id:e.optionId,name:e.label,values:{}}),void 0===t[e.optionId].values[e.valueIndex]&&(t[e.optionId].values[e.valueIndex]=e.optionTitle)})}),t}getCurrentProductOptions(t="array"){let e=null;const o={selected_configurable_option:!0,related_product:!0,item:!0,form_key:!0,saveToken:!0,thumbnailUrl:!0,printessSaveToken:!0,printessThumbnailUrl:!0,printessItemOptions:!0,product:!0};e="nameLookup"===t||"idLookup"===t?{}:[];const n=document.querySelector(this.PRODUCT_FORM_SELECTOR);if(!n)return console.error("Form not found: "+this.PRODUCT_FORM_SELECTOR),e;const i=new FormData(n),r=this.getVariantOptions();for(const n of i.entries())if(n[0]&&!o[n[0]]){let o={name:n[0],value:n[1].toString()};0===n[0].indexOf("super_attribute")&&(o.id=this.parseAttributeId(n[0]),o.valueId=parseInt(n[1]),void 0!==r[o.id]&&(o.name=r[o.id].name,void 0!==r[o.id].values[o.valueId]&&(o.value=r[o.id].values[o.valueId]))),"nameLookup"===t?e[o.name]=o:"idLookup"===t?e[o.id]=o:e.push(o)}return e}getVariantByProductOptions(t){let e=this.product.variants;if(!e||0===e.length)return null;const o=this.getVariantOptions(),n={};return this.recordForEach(t,(t,e)=>{for(const i in o)o.hasOwnProperty(i)&&o[i].name===t&&(n[t]=e)}),this.recordForEach(n,(t,o)=>{e=e.filter(e=>{let n=!1;return(e.formFields||[]).forEach(e=>{e.name===t&&e.value===o&&(n=!0)}),n})}),e.length>0?e[0]:(e=this.product.variants,this.recordForEach(n,(t,o)=>{e=e.filter(e=>{if(e.options){const n=e.options.filter(e=>e.label===t&&(e.optionTitle===o||e.defaultTitle===o));return n&&n.length>0}return!1})}),e.length>0?e[0]:null)}addItemsToBasket(t,e,o,n){const i=document.getElementById("printess-savetoken-field"),r=document.getElementById("printess-thumbnail_url-field"),s=document.getElementById("printess-item_options-field");let a=null;if(i&&(i.value=e,a=i.form),r&&(r.value=o,console.log("thumbnailUrl: "+o),a||(a=r.form)),s){let t={};this.cartItem?t=this.cartItem.options:this.getCurrentProductOptions("array").forEach(e=>{t[e.name]=e.value});const e=this.getGlobalConfig();if(e&&e.formFields)for(const o in e.formFields)e.formFields.hasOwnProperty(o)&&(t[o]=e.formFields[o]);n&&void 0!==n.pageCount&&(t.pageCount=n.pageCount.toString(),t.minPages=n.minPages.toString(),t.additionalPages=n.additionalPages.toString()),s.value=JSON.stringify(t)}const c=this.getGlobalConfig();if(c&&"function"==typeof c.onAddToBasket)try{c.onAddToBasket(e,o)}catch(t){console.error(t)}const d=document.getElementById("product-addtocart-button");d?(d.click(),window.require(["Magento_Customer/js/customer-data"],function(t){setTimeout(function(){var e=["cart"];t.invalidate(e),t.reload(e,!0)},1e3)})):a&&a.submit()}saveBasketItem(t,e,o,n){let i=this.product.entityId||-1,r=this.product.quantity||1;if(window.checkoutConfig&&window.checkoutConfig.quoteItemData){const t=window.checkoutConfig.quoteItemData;let e=null;t&&t.length>0&&(e=t.find(t=>t.item_id==this.cartItem.basketItemId)),e&&(i=e.product.entity_id,r=e.qty)}const s=("; "+document.cookie).split("; form_key=").pop().split(";")[0];let a="product="+encodeURIComponent(i);if(a+="&item="+encodeURIComponent(i),a+="&selected_configurable_option=",a+="&related_product=",a+="&form_key="+encodeURIComponent(s),this.cartItem.options)for(var c in this.cartItem.options)this.cartItem.options.hasOwnProperty(c)&&(a+="&"+encodeURIComponent(c)+"="+encodeURIComponent(this.cartItem.options[c]));let d={};this.cartItem?d=this.cartItem.options:this.getCurrentProductOptions("array").forEach(t=>{d[t.name]=t.value}),n&&void 0!==n.pageCount&&(d.pageCount=n.pageCount.toString(),d.minPages=n.minPages.toString(),d.additionalPages=n.additionalPages.toString());const l=this.getVariantByProductOptions(d);l&&(a+="&sku="+encodeURIComponent(l.sku),l&&l.options&&l.options.forEach(t=>{a+="&"+encodeURIComponent("super_attribute["+t.optionId+"]")+"="+encodeURIComponent(t.valueIndex),a+="&"+encodeURIComponent("options["+t.optionId+"]")+"="+encodeURIComponent(t.valueIndex)})),a+="&qty="+encodeURIComponent(r),a+="&printess_save_token="+encodeURIComponent(e),a+="&printess_thumbnail_url="+encodeURIComponent(o),a+="&printessItemOptions="+encodeURIComponent(JSON.stringify(d));const p=this.getGlobalConfig();if(p&&"function"==typeof p.onAddToBasket)try{p.onAddToBasket(e,o)}catch(t){console.error(t)}fetch(this.cartItem.addToCartLink,{method:"POST",body:a,headers:{"Content-Type":"application/x-www-form-urlencoded"}}).then(t=>{a="form_key="+encodeURIComponent(s),a+="&uenc="+encodeURIComponent(this.cartItem.deleteItemJson.data.uenc),a+="&id="+encodeURIComponent(this.cartItem.deleteItemJson.data.id),fetch(this.cartItem.deleteItemJson.action,{method:"POST",body:a,headers:{"Content-Type":"application/x-www-form-urlencoded"}}).then(t=>{window.require(["Magento_Customer/js/customer-data"],function(t){if(t){var e=["cart"];t.invalidate(e),t.reload(e,!0)}}),window.location=window.location}).catch(t=>{throw"Unable to add item to basket: "+t.statusText})}).catch(t=>{throw"Unable to add item to basket: "+t.statusText})}static async getBasketItemAndProductInfo(t){const e={settings:{},product:{},cartItem:{},saveToken:"",legalText:""},o=await fetch("/rest/V1/printess/getProductInfo",{method:"POST",mode:"cors",cache:"no-cache",credentials:"same-origin",headers:{"Content-Type":"application/json"},redirect:"follow",referrerPolicy:"no-referrer",body:JSON.stringify({id:t.product_id,sku:t.product_sku,itemId:t.item_id})});if(o.status>200)return alert("Unable to load product information"),void console.error(`Unable to load product information [${o.status}] ${o.statusText}: ${await o.text()}`);let n=await o.json();"string"==typeof n&&(n=JSON.parse(n));const i=[];if(t.options)for(var r in t.options)t.options.hasOwnProperty(r)&&t.options[r].hasOwnProperty("option_id")&&t.options[r].hasOwnProperty("option_value")&&i.push(t.options[r]);const s=(t,e)=>{if(n.options&&n.options[t])for(const o in n.options[t])if(n.options[t][o]===e)return o;return e},a={};if(t.options)for(var c in t.options)"printess_save_token"!=c&&"printess_thumbnail_url"!=c&&t.options.hasOwnProperty(c)&&(void 0!==t.options[c].value?void 0!==t.options[c].option_id?a["options["+t.options[c].option_id+"]"]=s(t.options[c].option_id,t.options[c].value):a[c]=s(t.options[c].option_id,t.options[c].value):void 0!==t.options[c].option_id?a["options["+t.options[c].option_id+"]"]=s(t.options[c].option_id,t.options[c].value):a[c]=t.options[c]);return e.settings={shopToken:n.editorSettings.shopToken,editorUrl:n.editorSettings.editorUrl,editorVersion:n.editorSettings.editorVersion,hidePricesInEditor:!0===n.editorSettings.hidePriceInEditor,priceFormat:n.priceFormat,uiSettings:{showStartupAnimation:n.editorSettings.showStartupAnimation,startupLogoUrl:n.editorSettings.customLogoUrl,theme:null,startupBackgroundColor:"#000000",uiVersion:n.editorSettings.uiVersion||""}},e.product={name:n.productName,price:n.productPrice,quantity:t.qty||1,entityId:n.entityId,variants:n.variants,formFields:n.formFields?JSON.parse(n.formFields):{}},e.cartItem={basketItemId:t.item_id,addToCartLink:n.addToCartLink,deleteItemJson:"string"!=typeof n.deleteJson?n.deleteJson:JSON.parse(n.deleteJson),options:a},e.legalText=n.legalText,e.saveToken=e.cartItem.options.printess_save_token?e.cartItem.options.printess_save_token.value:"",e}createShopContext(t){t.templateName||console.error("No template name provided");const e=this,o={onSave:null,templateNameOrSaveToken:t.templateName,stickers:[],legalText:t.legalText||"",legalTextUrl:t.legalTextUrl||"",snippetPrices:[],chargeEachStickerUsage:!1,hidePricesInEditor:void 0!==this.shopSettings.hidePricesInEditor&&!0===this.shopSettings.hidePricesInEditor,getMergeTemplates:function(){return[]},getProductName:function(){return e.product.name},getPriceInfo:function(){return{}},formatMoney:function(t){if("function"!=typeof e.formatPriceCallback&&"function"==typeof window.require){const t=window.require("Magento_Checkout/js/model/quote"),o=window.require("Magento_Catalog/js/price-utils");t&&o&&(e.formatPriceCallback=function(e){return o.formatPrice(e,t.getPriceFormat())})}return"function"==typeof e.formatPriceCallback?e.formatPriceCallback(t):parseFloat(""+t).toFixed(2)},getCurrentFormFieldValues:function(){let t={};e.cartItem?t=e.cartItem.options:e.getCurrentProductOptions("array").forEach(e=>{t[e.name]=e.value});const o=e.getVariantByProductOptions(t);o&&o.formFields&&o.formFields.forEach(e=>{t[e.name]=e.value});const n=e.getGlobalConfig();if(n&&n.formFields){const e="function"==typeof n.formFields?n.formFields():n.formFields;for(const o in e)e.hasOwnProperty(o)&&(t[o]=e[o])}return t},getPriceForFormFields:function(t){let o={};e.cartItem?o=e.cartItem.options:e.getCurrentProductOptions("array").forEach(t=>{o[t.name]=t.value});const n=e.getVariantByProductOptions(o);return n?n.price:e.product.price},onFormFieldChanged:(t,o,n,i)=>{const r=e.getVariantOptions();let s="",a=0,c="",d=0;for(const e in r)if(r.hasOwnProperty(e)){const l=r[e];if(l.name===t||l.name===n){s=l.name,a=l.id;for(const t in l.values)if(l.values.hasOwnProperty(t)&&(l.values[t]===o||l.values[t]===i)){c=l.values[t],d=parseInt(t);break}if(c)break}}if(c){const t=document.querySelector(".swatch-attribute[data-attribute-id='"+a+"']");if(t){t.setAttribute("data-option-selected",d.toString()),t.querySelectorAll(".swatch-option").forEach(t=>{t.getAttribute("data-option-id")===d.toString()?t.classList.add("selected"):t.classList.remove("selected")});const e=t.querySelector("select.swatch-select");if(e){e.value=d.toString();for(let t=0;t<e.options.length;++t){const o=e.options[t];o.selected=o.value===d.toString()}}}const o=document.querySelector("[name='super_attribute\\["+a.toString()+"\\]']");o&&(o.value=d.toString()),e.cartItem&&(e.cartItem.options||(e.cartItem.options={}),e.cartItem.options[s]=c)}},onAddToBasket:function(t,n,i){e.cartItem?e.saveBasketItem.call(e,o,t,n,i):e.addItemsToBasket.call(e,o,t,n,i)},getFormFieldMappings:()=>e.product.formFields?e.product.formFields:{}};return o}show(t){this.formatPriceCallback||"function"!=typeof window.require||window.require(["Magento_Catalog/js/price-utils"],t=>{t&&(this.formatPriceCallback=function(e){return t.formatPrice(e,this.shopSettings.priceFormat)})});const e=this.getGlobalConfig();if(e&&e.attachParams)for(const t in e.attachParams)e.attachParams.hasOwnProperty(t)&&(this.shopSettings.attachParams||(this.shopSettings.attachParams={}),this.shopSettings.attachParams[t]=e.attachParams[t]);if("function"==typeof window.initPrintessEditor){window.initPrintessEditor(this.shopSettings).show(this.createShopContext(t))}}static async createFromBasketItem(t){const e=await PrintessMagentoIntegration.getBasketItemAndProductInfo(t),o=new PrintessMagentoIntegration(e.settings,e.product,e.cartItem);return{legalText:e.legalText,saveToken:e.saveToken,editor:o}}static async editPrintessBasketItem(t){const e={product_sku:t.product_sku,product_id:t.product_id.toString(),options:{},item_id:t.item_id.toString(),qty:t.qty};let o="";t.options&&(t.options.printess_item_options&&(e.options=JSON.parse(t.options.printess_item_options.value)),t.options.printess_save_token&&(o=t.options.printess_save_token.value)),o&&PrintessMagentoIntegration.createFromBasketItem(e).then(t=>{t.editor.show({templateName:o,legalText:t.legalText})})}}
+﻿class PrintessMagentoIntegration {
+    constructor(shopSettings, product, cartItem) {
+        this.PRODUCT_FORM_SELECTOR = "#product_addtocart_form";
+        this.formatPriceCallback = null;
+        this.shopSettings = shopSettings;
+        this.product = product;
+        this.cartItem = cartItem;
+        if (this.product && this.product.variants) {
+            this.product.variants.forEach((variant) => {
+                if (variant.formFields && typeof variant.formFields === "string") {
+                    variant.formFields = JSON.parse(variant.formFields);
+                }
+            });
+        }
+    }
+    getGlobalConfig() {
+        return (window && window["printessGlobalConfig"] ? window["printessGlobalConfig"] : {});
+    }
+    recordForEach(record, callback) {
+        if (record && typeof callback === "function") {
+            for (const key in record) {
+                if (record.hasOwnProperty(key)) {
+                    if (callback(key, record[key]) === false) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    filterRecord(record, callback) {
+        const ret = {};
+        if (record && typeof callback === "function") {
+            for (const key in record) {
+                if (record.hasOwnProperty(key)) {
+                    if (callback(key, record[key]) === true) {
+                        ret[key] = record[key];
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+    mapRecord(record, callback) {
+        const ret = [];
+        if (record && typeof callback === "function") {
+            this.recordForEach(record, (key, value) => {
+                ret.push(callback(key, value));
+            });
+        }
+        return ret;
+    }
+    parseAttributeId(attributeReference) {
+        let ret = -1;
+        if (attributeReference.indexOf("super_attribute[") === 0 && attributeReference[attributeReference.length - 1] === "]") {
+            ret = parseInt(attributeReference.substring(16, attributeReference.length - 1));
+        }
+        return ret;
+    }
+    getVariantOptions() {
+        const options = {};
+        if (this.product && this.product.variants) {
+            this.product.variants.forEach((variant) => {
+                if (variant.options) {
+                    variant.options.forEach((option) => {
+                        if (typeof options[option.optionId] === "undefined") {
+                            options[option.optionId] = {
+                                id: option.optionId,
+                                name: option.label,
+                                values: {}
+                            };
+                        }
+                        if (typeof options[option.optionId].values[option.valueIndex] === "undefined") {
+                            options[option.optionId].values[option.valueIndex] = option.optionTitle;
+                        }
+                    });
+                }
+            });
+        }
+        return options;
+    }
+    getCurrentProductOptions(retType = "array") {
+        let ret = null;
+        const ignoreValues = {
+            "selected_configurable_option": true,
+            "related_product": true,
+            "item": true,
+            "form_key": true,
+            "saveToken": true,
+            "thumbnailUrl": true,
+            "printessSaveToken": true,
+            "printessThumbnailUrl": true,
+            "printessItemOptions": true,
+            "product": true
+        };
+        if (retType === "nameLookup") {
+            ret = {};
+        }
+        else if (retType === "idLookup") {
+            ret = {};
+        }
+        else {
+            ret = [];
+        }
+        const form = document.querySelector(this.PRODUCT_FORM_SELECTOR);
+        if (!form) {
+            console.error("Form not found: " + this.PRODUCT_FORM_SELECTOR);
+            return ret;
+        }
+        const formData = new FormData(form);
+        const options = this.getVariantOptions();
+        for (const pair of formData.entries()) {
+            if (pair[0]) {
+                if (!ignoreValues[pair[0]]) {
+                    let option = {
+                        name: pair[0],
+                        value: pair[1].toString()
+                    };
+                    if (pair[0].indexOf("super_attribute") === 0) {
+                        option.id = this.parseAttributeId(pair[0]);
+                        option.valueId = parseInt(pair[1]);
+                        if (typeof options[option.id] !== "undefined") {
+                            option.name = options[option.id].name;
+                            if (typeof options[option.id].values[option.valueId] !== "undefined") {
+                                option.value = options[option.id].values[option.valueId];
+                            }
+                        }
+                    }
+                    if (retType === "nameLookup") {
+                        ret[option.name] = option;
+                    }
+                    else if (retType === "idLookup") {
+                        ret[option.id] = option;
+                    }
+                    else {
+                        ret.push(option);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+    getVariantByProductOptions(options) {
+        let variants = this.product.variants;
+        if (!variants || variants.length === 0) {
+            return null;
+        }
+        const variantOptions = this.getVariantOptions();
+        const filteredOptions = {};
+        this.recordForEach(options, (key, value) => {
+            for (const optionId in variantOptions) {
+                if (variantOptions.hasOwnProperty(optionId)) {
+                    if (variantOptions[optionId].name === key) {
+                        filteredOptions[key] = value;
+                    }
+                }
+            }
+        });
+        //Try variant form field mappings first
+        this.recordForEach(filteredOptions, (key, value) => {
+            variants = variants.filter((variant) => {
+                let ret = false;
+                (variant.formFields || []).forEach((ff) => {
+                    if (ff.name === key && ff.value === value) {
+                        ret = true;
+                    }
+                });
+                return ret;
+            });
+        });
+        if (variants.length > 0) {
+            return variants[0];
+        }
+        //Not found via form field mappings, try via variant options
+        variants = this.product.variants;
+        this.recordForEach(filteredOptions, (key, value) => {
+            variants = variants.filter((variant) => {
+                if (variant.options) {
+                    const option = variant.options.filter(x => x.label === key && (x.optionTitle === value || x.defaultTitle === value));
+                    return option && option.length > 0;
+                }
+                return false;
+            });
+        });
+        if (variants.length > 0) {
+            return variants[0];
+        }
+        return null;
+    }
+    addItemsToBasket(context, saveToken, thumbnailUrl, params) {
+        const saveTokenEdit = document.getElementById("printess-savetoken-field");
+        const thumbnailUrlEdit = document.getElementById("printess-thumbnail_url-field");
+        const itemOptionField = document.getElementById("printess-item_options-field");
+        let form = null;
+        if (saveTokenEdit) {
+            saveTokenEdit.value = saveToken;
+            form = saveTokenEdit.form;
+        }
+        if (thumbnailUrlEdit) {
+            thumbnailUrlEdit.value = thumbnailUrl;
+            console.log("thumbnailUrl: " + thumbnailUrl);
+            if (!form) {
+                form = thumbnailUrlEdit.form;
+            }
+        }
+        if (itemOptionField) {
+            let currentFormFields = {};
+            if (this.cartItem) {
+                currentFormFields = this.cartItem.options;
+            }
+            else {
+                this.getCurrentProductOptions("array").forEach((x) => {
+                    currentFormFields[x.name] = x.value;
+                });
+            }
+            const globalConfig = this.getGlobalConfig();
+            if (globalConfig && globalConfig.formFields) {
+                for (const property in globalConfig.formFields) {
+                    if (globalConfig.formFields.hasOwnProperty(property)) {
+                        currentFormFields[property] = globalConfig.formFields[property];
+                    }
+                }
+            }
+            if (params && typeof params.pageCount !== "undefined") {
+                currentFormFields["pageCount"] = params.pageCount.toString();
+                currentFormFields["minPages"] = params.minPages.toString();
+                currentFormFields["additionalPages"] = params.additionalPages.toString();
+            }
+            itemOptionField.value = JSON.stringify(currentFormFields);
+        }
+        const globalConfig = this.getGlobalConfig();
+        if (globalConfig && typeof globalConfig.onAddToBasket === "function") {
+            try {
+                globalConfig.onAddToBasket(saveToken, thumbnailUrl);
+            }
+            catch (e) {
+                console.error(e);
+            }
+        }
+        const button = document.getElementById("product-addtocart-button");
+        if (button) {
+            button.click();
+            window.require([
+                'Magento_Customer/js/customer-data'
+            ], function (customerData) {
+                setTimeout(function () {
+                    var sections = ['cart'];
+                    customerData.invalidate(sections);
+                    customerData.reload(sections, true);
+                }, 1000);
+            });
+        }
+        else if (form) {
+            form.submit();
+        }
+    }
+    saveBasketItem(context, saveToken, thumbnailUrl, params) {
+        let productEntityId = this.product.entityId || -1;
+        let quantity = this.product.quantity || 1;
+        if (window.checkoutConfig && window.checkoutConfig.quoteItemData) {
+            //get the json for the basket item
+            const basketItems = window.checkoutConfig.quoteItemData;
+            let basketItem = null;
+            if (basketItems && basketItems.length > 0) {
+                basketItem = basketItems.find((item) => {
+                    return item.item_id == this.cartItem.basketItemId;
+                });
+            }
+            if (basketItem) {
+                productEntityId = basketItem.product.entity_id;
+                quantity = basketItem.qty;
+            }
+        }
+        const formKey = ('; ' + document.cookie).split(`; form_key=`).pop().split(';')[0];
+        let urlParams = "product=" + encodeURIComponent(productEntityId);
+        urlParams += "&item=" + encodeURIComponent(productEntityId);
+        urlParams += "&selected_configurable_option=";
+        urlParams += "&related_product=";
+        urlParams += "&form_key=" + encodeURIComponent(formKey);
+        if (this.cartItem.options) {
+            for (var key in this.cartItem.options) {
+                if (this.cartItem.options.hasOwnProperty(key)) {
+                    urlParams += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(this.cartItem.options[key]);
+                }
+            }
+        }
+        let currentFormFields = {};
+        if (this.cartItem) {
+            currentFormFields = this.cartItem.options;
+        }
+        else {
+            this.getCurrentProductOptions("array").forEach((x) => {
+                currentFormFields[x.name] = x.value;
+            });
+        }
+        if (params && typeof params.pageCount !== "undefined") {
+            currentFormFields["pageCount"] = params.pageCount.toString();
+            currentFormFields["minPages"] = params.minPages.toString();
+            currentFormFields["additionalPages"] = params.additionalPages.toString();
+        }
+        const selectedVariant = this.getVariantByProductOptions(currentFormFields);
+        if (selectedVariant) {
+            urlParams += "&sku=" + encodeURIComponent(selectedVariant.sku);
+            if (selectedVariant && selectedVariant.options) {
+                selectedVariant.options.forEach((x) => {
+                    urlParams += "&" + encodeURIComponent("super_attribute[" + x.optionId + "]") + "=" + encodeURIComponent(x.valueIndex);
+                    urlParams += "&" + encodeURIComponent("options[" + x.optionId + "]") + "=" + encodeURIComponent(x.valueIndex);
+                });
+            }
+        }
+        urlParams += "&qty=" + encodeURIComponent(quantity);
+        urlParams += "&printess_save_token=" + encodeURIComponent(saveToken);
+        urlParams += "&printess_thumbnail_url=" + encodeURIComponent(thumbnailUrl);
+        urlParams += "&printessItemOptions=" + encodeURIComponent(JSON.stringify(currentFormFields));
+        const globalConfig = this.getGlobalConfig();
+        if (globalConfig && typeof globalConfig.onAddToBasket === "function") {
+            try {
+                globalConfig.onAddToBasket(saveToken, thumbnailUrl);
+            }
+            catch (e) {
+                console.error(e);
+            }
+        }
+        this.replaceBasketItem(urlParams, formKey).then(() => {
+            window.require([
+                'Magento_Customer/js/customer-data'
+            ], function (customerData) {
+                if (customerData) {
+                    var sections = ['cart'];
+                    customerData.invalidate(sections);
+                    customerData.reload(sections, true);
+                }
+            });
+            window.location = window.location;
+        });
+    }
+    async replaceBasketItem(addUrlParams, formKey) {
+        console.log("[replaceBasketItem] addToCartLink:", this.cartItem.addToCartLink);
+        let response = await fetch(this.cartItem.addToCartLink, {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            body: addUrlParams,
+            redirect: "manual",
+            referrerPolicy: "no-referrer",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        });
+        if (!response.ok && response.type !== "opaqueredirect") {
+            throw "Unable to create new Basket item: [" + response.status + "] " + response.statusText;
+        }
+        let deleteUrlParams = "form_key=" + encodeURIComponent(formKey);
+        deleteUrlParams += "&uenc=" + encodeURIComponent(this.cartItem.deleteItemJson.data.uenc);
+        deleteUrlParams += "&id=" + encodeURIComponent(this.cartItem.deleteItemJson.data.id);
+        response = await fetch(this.cartItem.deleteItemJson.action, {
+            method: "POST",
+            body: deleteUrlParams,
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            redirect: "manual",
+            referrerPolicy: "no-referrer",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        });
+        if (!response.ok && response.type !== "opaqueredirect") {
+            throw "Unable to delete Basket item: [" + response.status + "] " + response.statusText;
+        }
+    }
+    static async getBasketItemAndProductInfo(context) {
+        const ret = {
+            settings: {},
+            product: {},
+            cartItem: {},
+            saveToken: "",
+            legalText: ""
+        };
+        const response = await fetch("/rest/V1/printess/getProductInfo", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            redirect: "manual",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({ "id": context.product_id, "sku": context.product_sku, "itemId": context.item_id })
+        });
+        if (response.status > 200) {
+            alert("Unable to load product information");
+            console.error(`Unable to load product information [${response.status}] ${response.statusText}: ${await response.text()}`);
+            return null;
+        }
+        let info = await response.json();
+        if (typeof info === "string") {
+            info = JSON.parse(info);
+        }
+        const selectedProductOptions = [];
+        if (context.options) {
+            for (var prop in context.options) {
+                if (context.options.hasOwnProperty(prop) && context.options[prop].hasOwnProperty("option_id") && context.options[prop].hasOwnProperty("option_value")) {
+                    selectedProductOptions.push(context.options[prop]);
+                }
+            }
+        }
+        const getOptionValue = (optionId, optionValue) => {
+            if (info.options && info.options[optionId]) {
+                for (const key in info.options[optionId]) {
+                    if (info.options[optionId][key] === optionValue) {
+                        return key;
+                    }
+                }
+            }
+            return optionValue;
+        };
+        const options = {};
+        let formFields = {};
+        if (context.options) {
+            for (var key in context.options) {
+                if (key != "printess_save_token" && key != "printess_thumbnail_url") {
+                    if (context.options.hasOwnProperty(key)) {
+                        if (typeof context.options[key].value !== "undefined") {
+                            if (typeof context.options[key]["option_id"] !== "undefined") {
+                                options["options[" + context.options[key]["option_id"] + "]"] = getOptionValue(context.options[key]["option_id"], context.options[key].value);
+                            }
+                            else {
+                                options[key] = getOptionValue(context.options[key]["option_id"], context.options[key].value);
+                            }
+                        }
+                        else {
+                            if (typeof context.options[key]["option_id"] !== "undefined") {
+                                options["options[" + context.options[key]["option_id"] + "]"] = getOptionValue(context.options[key]["option_id"], context.options[key].value);
+                            }
+                            else {
+                                options[key] = context.options[key];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ret.settings = {
+            shopToken: info.editorSettings.shopToken,
+            editorUrl: info.editorSettings.editorUrl,
+            editorVersion: info.editorSettings.editorVersion,
+            hidePricesInEditor: info.editorSettings.hidePriceInEditor === true,
+            priceFormat: info.priceFormat,
+            uiSettings: {
+                showStartupAnimation: info.editorSettings.showStartupAnimation,
+                startupLogoUrl: info.editorSettings.customLogoUrl,
+                theme: null,
+                startupBackgroundColor: "#000000",
+                uiVersion: info.editorSettings.uiVersion || ""
+            }
+        };
+        ret.product = {
+            name: info.productName,
+            price: info.productPrice,
+            quantity: context.qty || 1,
+            entityId: info.entityId,
+            variants: info.variants,
+            formFields: info.formFields ? JSON.parse(info.formFields) : {}
+        };
+        ret.cartItem = {
+            basketItemId: context.item_id,
+            addToCartLink: info.addToCartLink,
+            deleteItemJson: typeof info.deleteJson !== "string" ? info.deleteJson : JSON.parse(info.deleteJson),
+            options: options
+        };
+        ret.legalText = info.legalText;
+        ret.saveToken = ret.cartItem.options["printess_save_token"] ? ret.cartItem.options["printess_save_token"].value : "";
+        return ret;
+    }
+    createShopContext(options) {
+        if (!options.templateName) {
+            console.error("No template name provided");
+        }
+        const that = this;
+        const context = {
+            onSave: null,
+            templateNameOrSaveToken: options.templateName,
+            stickers: [],
+            legalText: options.legalText || "",
+            legalTextUrl: options.legalTextUrl || "",
+            snippetPrices: [],
+            chargeEachStickerUsage: false,
+            hidePricesInEditor: typeof this.shopSettings.hidePricesInEditor !== "undefined" && this.shopSettings.hidePricesInEditor === true,
+            getMergeTemplates: function () { return []; },
+            getProductName: function () { return that.product.name; },
+            getPriceInfo: function () { return {}; },
+            formatMoney: function (price) {
+                if (typeof that.formatPriceCallback !== "function" && typeof window["require"] === "function") {
+                    const quote = window["require"]("Magento_Checkout/js/model/quote");
+                    const priceUtils = window["require"]('Magento_Catalog/js/price-utils');
+                    if (quote && priceUtils) {
+                        that.formatPriceCallback = function (price) {
+                            return priceUtils.formatPrice(price, quote.getPriceFormat());
+                        };
+                    }
+                }
+                if (typeof that.formatPriceCallback === "function") {
+                    return that.formatPriceCallback(price);
+                }
+                else {
+                    return parseFloat("" + price).toFixed(2);
+                }
+            },
+            getCurrentFormFieldValues: function () {
+                let ret = {};
+                if (that.cartItem) {
+                    ret = that.cartItem.options;
+                }
+                else {
+                    that.getCurrentProductOptions("array").forEach((x) => {
+                        ret[x.name] = x.value;
+                    });
+                }
+                const selectedVariant = that.getVariantByProductOptions(ret);
+                if (selectedVariant && selectedVariant.formFields) {
+                    selectedVariant.formFields.forEach((x) => {
+                        ret[x.name] = x.value;
+                    });
+                }
+                const globalConfig = that.getGlobalConfig();
+                if (globalConfig && globalConfig.formFields) {
+                    const formFields = typeof globalConfig.formFields === "function" ? globalConfig.formFields() : globalConfig.formFields;
+                    for (const property in formFields) {
+                        if (formFields.hasOwnProperty(property)) {
+                            ret[property] = formFields[property];
+                        }
+                    }
+                }
+                return ret;
+            },
+            getPriceForFormFields: function (formFields) {
+                let productOptions = {};
+                if (that.cartItem) {
+                    productOptions = that.cartItem.options;
+                }
+                else {
+                    that.getCurrentProductOptions("array").forEach((x) => {
+                        productOptions[x.name] = x.value;
+                    });
+                }
+                const selectedVariant = that.getVariantByProductOptions(productOptions);
+                if (selectedVariant) {
+                    return selectedVariant.price;
+                }
+                return that.product.price;
+            },
+            onFormFieldChanged: (formField, value, formFieldLabel, valueLabel) => {
+                const availableOptions = that.getVariantOptions();
+                let selectedOptionName = "";
+                let selectedOptionId = 0;
+                let selectedValueName = "";
+                let selectedValueId = 0;
+                for (const optionId in availableOptions) {
+                    if (availableOptions.hasOwnProperty(optionId)) {
+                        const option = availableOptions[optionId];
+                        if (option.name === formField || option.name === formFieldLabel) {
+                            selectedOptionName = option.name;
+                            selectedOptionId = option.id;
+                            for (const valueId in option.values) {
+                                if (option.values.hasOwnProperty(valueId)) {
+                                    if (option.values[valueId] === value || option.values[valueId] === valueLabel) {
+                                        selectedValueName = option.values[valueId];
+                                        selectedValueId = parseInt(valueId);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (selectedValueName) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (selectedValueName) {
+                    //Checkboxen
+                    const swatchAttribute = document.querySelector(".swatch-attribute[data-attribute-id='" + selectedOptionId + "']");
+                    if (swatchAttribute) {
+                        swatchAttribute.setAttribute("data-option-selected", selectedValueId.toString());
+                        swatchAttribute.querySelectorAll(".swatch-option").forEach((x) => {
+                            if (x.getAttribute("data-option-id") === selectedValueId.toString()) {
+                                x.classList.add("selected");
+                            }
+                            else {
+                                x.classList.remove("selected");
+                            }
+                        });
+                        //in case this is a select option, get the select input
+                        const selectElement = swatchAttribute.querySelector("select.swatch-select");
+                        if (selectElement) {
+                            selectElement.value = selectedValueId.toString();
+                            for (let index = 0; index < selectElement.options.length; ++index) {
+                                const currentOption = selectElement.options[index];
+                                currentOption.selected = currentOption.value === selectedValueId.toString();
+                            }
+                        }
+                    }
+                    //Set the input value in case of check box
+                    const checkboxInput = document.querySelector("[name='super_attribute\\[" + selectedOptionId.toString() + "\\]']");
+                    if (checkboxInput) {
+                        checkboxInput.value = selectedValueId.toString();
+                    }
+                    if (that.cartItem) {
+                        if (!that.cartItem.options) {
+                            that.cartItem.options = {};
+                        }
+                        that.cartItem.options[selectedOptionName] = selectedValueName;
+                    }
+                }
+            },
+            onAddToBasket: function (saveToken, thumbnailUrl, params) {
+                if (!that.cartItem) {
+                    that.addItemsToBasket.call(that, context, saveToken, thumbnailUrl, params);
+                }
+                else {
+                    that.saveBasketItem.call(that, context, saveToken, thumbnailUrl, params);
+                }
+            },
+            getFormFieldMappings() {
+                if (that.product.formFields) {
+                    return that.product.formFields;
+                }
+                return {};
+            }
+        };
+        return context;
+    }
+    show(options) {
+        if (!this.formatPriceCallback && typeof window["require"] === "function") {
+            window["require"](['Magento_Catalog/js/price-utils'], (priceUtils) => {
+                if (priceUtils) {
+                    this.formatPriceCallback = function (price) {
+                        return priceUtils.formatPrice(price, this.shopSettings.priceFormat);
+                    };
+                }
+            });
+        }
+        const globalConfig = this.getGlobalConfig();
+        if (globalConfig && globalConfig.attachParams) {
+            for (const property in globalConfig.attachParams) {
+                if (globalConfig.attachParams.hasOwnProperty(property)) {
+                    if (!this.shopSettings.attachParams) {
+                        this.shopSettings.attachParams = {};
+                    }
+                    this.shopSettings.attachParams[property] = globalConfig.attachParams[property];
+                }
+            }
+        }
+        if (typeof window["initPrintessEditor"] === "function") {
+            const editor = window["initPrintessEditor"](this.shopSettings);
+            editor.show(this.createShopContext(options));
+        }
+    }
+    static async createFromBasketItem(basketItem) {
+        const options = await PrintessMagentoIntegration.getBasketItemAndProductInfo(basketItem);
+        const cartItem = {};
+        const editor = new PrintessMagentoIntegration(options.settings, options.product, options.cartItem);
+        return {
+            legalText: options.legalText,
+            saveToken: options.saveToken,
+            editor: editor
+        };
+    }
+    static async editPrintessBasketItem(itemData) {
+        const basketItem = {
+            "product_sku": itemData["product_sku"],
+            "product_id": itemData["product_id"].toString(),
+            "options": {},
+            "item_id": itemData["item_id"].toString(),
+            "qty": itemData["qty"]
+        };
+        let saveToken = "";
+        if (itemData["options"]) {
+            if (itemData["options"]["printess_item_options"]) {
+                basketItem["options"] = JSON.parse(itemData["options"]["printess_item_options"].value);
+            }
+            if (itemData["options"]["printess_save_token"]) {
+                saveToken = itemData["options"]["printess_save_token"].value;
+            }
+        }
+        if (saveToken) {
+            const result = await PrintessMagentoIntegration.createFromBasketItem(basketItem);
+            if (result) {
+                result.editor.show({
+                    templateName: saveToken,
+                    legalText: result.legalText
+                });
+            }
+        }
+    }
+}

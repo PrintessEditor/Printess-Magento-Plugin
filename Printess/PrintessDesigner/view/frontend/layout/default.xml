@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <script src="Printess_PrintessDesigner::js/printessEditor.js"/>
-        <script src="Printess_PrintessDesigner::js/printessMagento.js"/>
+        <!-- <script src="Printess_PrintessDesigner::js/printessEditor.js"/>
+        <script src="Printess_PrintessDesigner::js/printessMagento.js"/> -->
     </head>
 </page>
